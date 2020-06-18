@@ -1,5 +1,5 @@
-User-Name="vpn293b50c891377b94c904b42396e45fd99d"
-MS-CHAP-Password="derpderp"
+User-Name="905322156826"
+MS-CHAP-Password="asdasd"
 NAS-IP-Address="127.0.0.1"
 NAS-Identifier="MikroTik"
 NAS-Port="33"

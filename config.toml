@@ -1,12 +1,12 @@
-Dsn = "user:password@/dbname?charset=utf8mb4,utf8"
+Dsn = "radiusd:supersecretpassword@/vpnxs_radius?charset=utf8mb4,utf8"
 ControlListen="127.0.0.1:8124"
 
 [listen]
 	[listen.auth]
-		Addr="127.0.0.1:1812"
+		Addr="0.0.0.0:1812"
 		Secret="secret"
-		CIDR=["127.0.0.1/32"]
+		CIDR=["0.0.0.0/0"]
 	[listen.acct]
-		Addr="127.0.0.1:1813"
+		Addr="0.0.0.0:1813"
 		Secret="secret"
-		CIDR=["127.0.0.1/32"]
+		CIDR=["0.0.0.0/0"]

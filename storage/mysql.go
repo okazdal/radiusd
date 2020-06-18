@@ -17,9 +17,9 @@ import (
 	"database/sql"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/mpdroog/radiusd/model"
 	"github.com/mpdroog/radiusd/sync"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 )
 
@@ -49,7 +49,7 @@ func (s *MySQL) Strict() (err error) {
 
 func (s *MySQL) GetUser(name string) (user model.User, err error) {
 	err = s.DB.QueryRow(selectUser, name).Scan(
-		&user.Pass,
+		&user.Passwd,
 		&user.BlockRemain,
 		&user.ActiveUntil,
 		&user.Ok,

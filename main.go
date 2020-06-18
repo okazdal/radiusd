@@ -35,8 +35,8 @@ func listenAndServe(l config.Listener) {
 
 func main() {
 	var configPath string
-	flag.BoolVar(&config.Debug, "d", false, "Debug packetdata")
-	flag.BoolVar(&config.Verbose, "v", false, "Show all that happens")
+	flag.BoolVar(&config.Debug, "d", true, "Debug packetdata")
+	flag.BoolVar(&config.Verbose, "v", true, "Show all that happens")
 	flag.StringVar(&configPath, "c", "./config.toml", "Configuration")
 	flag.Parse()
 

@@ -128,7 +128,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user` varchar(100) NOT NULL,
-  `pass` varchar(255) NOT NULL,
+  `passwd` varchar(255) NOT NULL,
   `block_remaining` bigint(20) unsigned DEFAULT NULL,
   `active_until` date NULL DEFAULT NULL COMMENT 'Account becomes inactive on given date',
   `dedicated_ip` varchar(50) DEFAULT NULL COMMENT 'Static IP',

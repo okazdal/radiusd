@@ -1,7 +1,7 @@
 package model
 
 type User struct {
-	Pass            string
+	Passwd          string
 	ActiveUntil     *string // Account active until YYYY-MM-DD
 	BlockRemain     *int64  // Remaining bandwidth
 	SimultaneousUse uint32  // Max conns allowed

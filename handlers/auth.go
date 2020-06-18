@@ -24,14 +24,14 @@ func (h *Handler) Auth(w io.Writer, req *radius.Packet) {
 		h.Logger.Printf("auth.begin e=" + e.Error())
 		return
 	}
-	if limits.Pass == "" {
+	if limits.Passwd == "" {
 		w.Write(radius.DefaultPacket(req, radius.AccessReject, "No such user", h.Verbose, h.Logger))
 		return
 	}
 
 	if req.HasAttr(radius.UserPassword) {
 		pass := radius.DecryptPassword(req.Attr(radius.UserPassword), req)
-		if pass != limits.Pass {
+		if pass != limits.Passwd {
 			w.Write(radius.DefaultPacket(req, radius.AccessReject, "Invalid password", h.Verbose, h.Logger))
 			return
 		}
@@ -44,7 +44,7 @@ func (h *Handler) Auth(w io.Writer, req *radius.Packet) {
 
 		// TODO: No challenge then use Request Authenticator
 
-		if !radius.CHAPMatch(limits.Pass, hash, challenge) {
+		if !radius.CHAPMatch(limits.Passwd, hash, challenge) {
 			w.Write(radius.DefaultPacket(req, radius.AccessReject, "Invalid password", h.Verbose, h.Logger))
 			return
 		}
@@ -84,13 +84,13 @@ func (h *Handler) Auth(w io.Writer, req *radius.Packet) {
 				}
 
 				// Check for correctness
-				calc, e := mschap.Encryptv1(challenge, limits.Pass)
+				calc, e := mschap.Encryptv1(challenge, limits.Passwd)
 				if e != nil {
 					h.Logger.Printf("MSCHAPv1: " + e.Error())
 					w.Write(radius.DefaultPacket(req, radius.AccessReject, "MSCHAPv1: Server-side processing error", h.Verbose, h.Logger))
 					return
 				}
-				mppe, e := mschap.Mppev1(limits.Pass)
+				mppe, e := mschap.Mppev1(limits.Passwd)
 				if e != nil {
 					h.Logger.Printf("MPPEv1: " + e.Error())
 					w.Write(radius.DefaultPacket(req, radius.AccessReject, "MPPEv1: Server-side processing error", h.Verbose, h.Logger))
@@ -140,13 +140,13 @@ func (h *Handler) Auth(w io.Writer, req *radius.Packet) {
 					w.Write(radius.DefaultPacket(req, radius.AccessReject, "MSCHAPv2: Flags should be set to 0", h.Verbose, h.Logger))
 					return
 				}
-				enc, e := mschap.Encryptv2(challenge, res.PeerChallenge, user, limits.Pass)
+				enc, e := mschap.Encryptv2(challenge, res.PeerChallenge, user, limits.Passwd)
 				if e != nil {
 					h.Logger.Printf("MSCHAPv2: " + e.Error())
 					w.Write(radius.DefaultPacket(req, radius.AccessReject, "MSCHAPv2: Server-side processing error", h.Verbose, h.Logger))
 					return
 				}
-				send, recv := mschap.Mmpev2(req.Secret(), limits.Pass, req.Auth, res.Response)
+				send, recv := mschap.Mmpev2(req.Secret(), limits.Passwd, req.Auth, res.Response)
 
 				if bytes.Compare(res.Response, enc.ChallengeResponse) != 0 {
 					if h.Verbose {
