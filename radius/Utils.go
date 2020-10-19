@@ -84,6 +84,7 @@ func ValidateAuthRequest(p *Packet) string {
 	// attribute or both unless the type of access being requested does
 	// not involve a port or the NAS does not distinguish among its
 	// ports.
+	// MODIFIED BY MEH
 	if !p.HasAttr(NASPort) {
 		return "NASPort missing"
 	}
@@ -124,6 +125,7 @@ func ValidateAcctRequest(p *Packet) string {
 	// It SHOULD contain a NAS-Port or NAS-
 	// Port-Type attribute or both unless the service does not involve a
 	// port or the NAS does not distinguish among its ports.
+	// MODIFIED BY MEH
 	if !p.HasAttr(NASPort) {
 		return "NASPort missing"
 	}

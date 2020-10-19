@@ -73,7 +73,8 @@ func Serve(conn *net.UDPConn, secret string, cidrs []string, verbose bool, logge
 		}
 		if !validate(p, verbose, logger) {
 			// TODO: Silently ignore invalidate package?
-			return fmt.Errorf("Invalid MessageAuthenticator")
+			log.Println("Invalid MessageAuthenticator")
+			//return fmt.Errorf("Invalid MessageAuthenticator")
 		}
 
 		statusType := uint32(0)
