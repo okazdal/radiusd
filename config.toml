@@ -1,4 +1,4 @@
-Dsn = "root:root@/vpnxs_radius?charset=utf8mb4,utf8"
+Dsn = "root:example@/radsec?charset=utf8mb4,utf8"
 ControlListen="127.0.0.1:8124"
 
 [listen]

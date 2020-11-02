@@ -1,12 +1,54 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
+	"log"
 
 	"github.com/mpdroog/radiusd/model"
 	"github.com/mpdroog/radiusd/queue"
 	"github.com/mpdroog/radiusd/radius"
+	"github.com/streadway/amqp"
 )
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Println("%s: %s", msg, err)
+	}
+}
+
+func btkLogger(log string) {
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	q, err := ch.QueueDeclare(
+		"log", // name
+		false, // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
+	)
+	failOnError(err, "Failed to declare a queue")
+
+	body := log
+	err = ch.Publish(
+		"",     // exchange
+		q.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        []byte(body),
+		})
+	//log.Printf(" [x] Sent %s", body)
+	failOnError(err, "Failed to publish a message")
+}
 
 func createSess(req *radius.Packet) model.Session {
 	return model.Session{
@@ -56,6 +98,8 @@ func (h *Handler) AcctBegin(w io.Writer, req *radius.Packet) {
 		return
 	}
 	w.Write(req.Response(radius.AccountingResponse, reply, h.Verbose, h.Logger))
+
+	btkLogger(fmt.Sprintf("acct.begin sess=%s for user=%s on nasIP=%s", sess, user, nasIp))
 }
 
 func (h *Handler) AcctUpdate(w io.Writer, req *radius.Packet) {
@@ -79,6 +123,8 @@ func (h *Handler) AcctUpdate(w io.Writer, req *radius.Packet) {
 	queue.Queue(sess.User, sess.BytesIn, sess.BytesOut, sess.PacketsIn, sess.PacketsOut)
 
 	w.Write(radius.DefaultPacket(req, radius.AccountingResponse, "Updated accounting.", h.Verbose, h.Logger))
+	btkLogger(fmt.Sprintf("acct.update sess=%s for user=%s on NasIP=%s sessTime=%d octetsIn=%d octetsOut=%d",
+		sess.SessionID, sess.User, sess.NasIP, sess.SessionTime, sess.BytesIn, sess.BytesOut))
 }
 
 func (h *Handler) AcctStop(w io.Writer, req *radius.Packet) {
@@ -120,4 +166,6 @@ func (h *Handler) AcctStop(w io.Writer, req *radius.Packet) {
 	queue.Queue(user, octIn, octOut, packIn, packOut)
 
 	w.Write(radius.DefaultPacket(req, radius.AccountingResponse, "Finished accounting.", h.Verbose, h.Logger))
+	btkLogger(fmt.Sprintf("acct.stop sess=%s for user=%s sessTime=%d octetsIn=%d octetsOut=%d",
+		sess, user, sessTime, octIn, octOut))
 }
