@@ -143,6 +143,8 @@ func (h *Handler) AcctStop(w io.Writer, req *radius.Packet) {
 	packIn := radius.DecodeFour(req.Attr(radius.AcctInputPackets))
 	packOut := radius.DecodeFour(req.Attr(radius.AcctOutputPackets))
 
+	termCause := radius.DecodeFour(req.Attr(radius.AcctTerminateCause))
+
 	if h.Verbose {
 		h.Logger.Printf(
 			"acct.stop sess=%s for user=%s sessTime=%d octetsIn=%d octetsOut=%d",
@@ -166,6 +168,6 @@ func (h *Handler) AcctStop(w io.Writer, req *radius.Packet) {
 	queue.Queue(user, octIn, octOut, packIn, packOut)
 
 	w.Write(radius.DefaultPacket(req, radius.AccountingResponse, "Finished accounting.", h.Verbose, h.Logger))
-	btkLogger(fmt.Sprintf("acct.stop sess=%s for user=%s sessTime=%d octetsIn=%d octetsOut=%d",
-		sess, user, sessTime, octIn, octOut))
+	btkLogger(fmt.Sprintf("acct.stop sess=%s for user=%s sessTime=%d octetsIn=%d octetsOut=%d termCause=%d",
+		sess, user, sessTime, octIn, octOut, termCause))
 }
